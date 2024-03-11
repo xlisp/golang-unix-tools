@@ -48,7 +48,7 @@ curl http://127.0.0.1:8080/ping
 ```
 ## clojure core.async VS go goroutine
 
-channels
+* channels
 
 ```go
 func boring(msg string, c chan string) {
@@ -79,6 +79,47 @@ vs: clojure的>!! 和 go的c <- , clojure的<!!和 <-c
 (defn -main [& args]
   (let [c (chan)]
     (go (boring "boring!" c))
+    (dotimes [_ 5]
+      (println (<!! c)))
+    (println "You're boring; I'm leaving.")))
+```
+
+* function that returns a channel
+
+go 宏把函数包起来
+
+```go
+func boring(msg string) <-chan string { // Returns receive-only channel of strs.
+	c := make(chan string)
+	go func() { // We launch the goroutine from inside the function.
+		for i := 0; ; i++ {
+			c <- fmt.Sprintf("%s %d", msg, i)
+			time.Sleep(time.Duration(rand.Intn(1e3)) * time.Millisecond)
+		}
+	}()
+	return c // Return channel to the caller
+}
+
+func main() {
+	c:= boring("boring!") // Function returning a channel.
+	for i := 0; i < 5; i++ {
+		fmt.Printf("You say: %q\n", <-c)
+	}
+	fmt.Println("You're boring; I'm leaving.")
+}
+```
+
+```clojure
+(defn boring [msg]
+  (let [c (chan)]
+    (go (loop [i 0]
+          (>!! c (str msg " " i))
+          (Thread/sleep (rand-int 1000))
+          (recur (inc i))))
+    c))
+
+(defn -main [& args]
+  (let [c (boring "boring!")]
     (dotimes [_ 5]
       (println (<!! c)))
     (println "You're boring; I'm leaving.")))
