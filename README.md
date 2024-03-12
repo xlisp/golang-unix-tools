@@ -127,6 +127,8 @@ func main() {
 
 ## map
 
+https://hedzr.com/golang/fp/golang-functional-programming-in-brief/
+
 ```go
 // The higher-order-function takes an array and a function as arguments
 func mapForEach(arr []string, fn func(it string) int) []int {
@@ -145,6 +147,75 @@ func main() {
 		return len(it)
 	})
 	fmt.Println(out) // [6, 5, 6, 5]
+}
+
+```
+
+## 函数作为参数
+
+```go
+
+package main
+
+type Handler func (a int)
+
+func xc(pa int, handler Handler) {
+  handler(pa)
+}
+
+func main(){
+  xc(123, func(a int){
+	  print (a) //=> 123
+  })
+}
+
+```
+## 递归
+
+```go
+func factorialTailRecursive(num int) int {
+	return factorial2(1, num)
+}
+
+func factorial2(accumulator, val int) int {
+	if val == 1 {
+		return accumulator
+	}
+	return factorial2(accumulator*val, val-1)
+}
+
+func main() {
+	fmt.Println(factorialTailRecursive(10)) // 3628800
+}
+
+```
+
+## functor
+
+```go
+
+package main
+
+func add(a, b int) int { return a+b }
+func sub(a, b int) int { return a-b }
+
+var operators map[string]func(a, b int) int
+
+func init(){
+	operators = map[string]func(a, b int) int {
+		"+": add,
+			"-": sub,
+	}
+}
+
+
+func calculator(a, b int, op string) int {
+	fn := operators[op]
+	return fn(a, b)
+}
+
+func main() {
+	print(calculator(1, 2, "+")) //=> 3
 }
 
 ```
