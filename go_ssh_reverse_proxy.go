@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"os"
@@ -12,11 +13,11 @@ import (
 
 func main() {
 	// SSH server credentials
-	server := "xxxxxxx:22"
+	server := "xxxxxxxxx:22"
 	user := "ubuntu"
 
 	// Path to private key file
-	keyPath := "/path/to/private/key"
+	keyPath := "/Users/emacspy/Documents/new_main_server.pem"
 
 	// Read private key
 	key, err := os.ReadFile(keyPath)
@@ -48,7 +49,7 @@ func main() {
 	defer client.Close()
 
 	// Listen on local port 8899 for reverse tunnel
-	localListener, err := net.Listen("tcp", "0.0.0.0:8899")
+	localListener, err := net.Listen("tcp", "0.0.0.0:8898")
 	if err != nil {
 		log.Fatalf("failed to listen on local port 8899: %v", err)
 	}
@@ -89,7 +90,7 @@ func pipe(conn1, conn2 net.Conn) error {
 	errChan := make(chan error, 2)
 
 	copyConn := func(dst, src net.Conn) {
-		_, err := net.Copy(dst, src)
+		_, err := io.Copy(dst, src)
 		errChan <- err
 	}
 
@@ -104,3 +105,14 @@ func pipe(conn1, conn2 net.Conn) error {
 
 	return nil
 }
+
+/*
+@ go run go_ssh_reverse_proxy_2.go
+Listening on port 8899 for reverse SSH tunnel...
+
+but: 
+~$ ssh -p 8898 emacspy@127.0.0.1
+ssh: connect to host 127.0.0.1 port 8898: Connection refused
+
+*/
+
