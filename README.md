@@ -1,11 +1,15 @@
 # jim-emacs-fun-go
 
-## install
-
-```
-wget https://dl.google.com/go/go1.22.1.darwin-amd64.pkg
-which go #=>  /usr/local/go/bin/go
-```
+- [jim-emacs-fun-go](#jim-emacs-fun-go)
+  - [gin](#gin)
+  - [clojure core.async VS go goroutine](#clojure-coreasync-vs-go-goroutine)
+  - [map](#map)
+  - [函数作为参数](#%E5%87%BD%E6%95%B0%E4%BD%9C%E4%B8%BA%E5%8F%82%E6%95%B0)
+  - [递归](#%E9%80%92%E5%BD%92)
+  - [functor](#functor)
+  - [调用C语言](#%E8%B0%83%E7%94%A8c%E8%AF%AD%E8%A8%80)
+  - [run test](#run-test)
+  - [add lib](#add-lib)
 
 ## gin
 
@@ -219,3 +223,55 @@ func main() {
 }
 
 ```
+
+## 调用C语言
+
+```c
+// add.c
+#include <stdint.h>
+
+void Add(uint64_t a, uint64_t b, uint64_t *ret) {
+    *ret = a + b;
+}
+```
+* call add.c
+```go
+package main
+
+import "C"
+import (
+    "fmt"
+)
+
+func main() {
+    var result C.uint64_t
+
+    // Call the C function
+    C.Add(10, 20, &result)
+
+    fmt.Println("Result:", result)
+}
+
+/* Run:
+$ go run addgo.go
+Result: 30
+*/
+```
+
+
+## run test
+* `*_test.go`
+
+```
+go test
+```
+
+## add lib
+
+```
+$ go get github.com/rabbitmq/amqp091-go
+
+go: downloading github.com/rabbitmq/amqp091-go v1.10.0
+go: added github.com/rabbitmq/amqp091-go v1.10.0
+```
+
