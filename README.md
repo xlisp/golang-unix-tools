@@ -1,5 +1,5 @@
-# jim-emacs-fun-go
 
+# jim-emacs-fun-go
 * 系统底层脚本(代理,内网穿透~), docker hacker, cuda等C++库调用...
 
 - [jim-emacs-fun-go](#jim-emacs-fun-go)
@@ -12,6 +12,9 @@
   - [调用C语言](#%E8%B0%83%E7%94%A8c%E8%AF%AD%E8%A8%80)
   - [run test](#run-test)
   - [add lib](#add-lib)
+  - [ssh内网穿透](#ssh%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F)
+  - [ssh内网穿透,断网自动重连](#ssh%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F%E6%96%AD%E7%BD%91%E8%87%AA%E5%8A%A8%E9%87%8D%E8%BF%9E)
+
 
 ## gin
 
