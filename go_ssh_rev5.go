@@ -1,31 +1,46 @@
 package main
 
 import (
-	"io"
+    "fmt"
+    "io"
     "io/ioutil"
     "log"
     "net"
+    "strings"
     "time"
 
     "golang.org/x/crypto/ssh"
 )
 
-func main() {
-    // SSH server details
-    serverAddr := "xxxxxx:22"
-    user := "ubuntu"
-    keyPath := "/home/xlisp/xxxx.pem"
+const (
+    serverAddr = "xxxxxxx:22"
+    user       = "ubuntu"
+    keyPath    = "/home/xlisp/xxx.pem"
+    localPort  = "127.0.0.1:22"
+    remotePort = "0.0.0.0:8899"
+)
 
+func main() {
+    for {
+        if err := runSSHForward(); err != nil {
+            log.Printf("SSH forwarding stopped: %v", err)
+            log.Println("Attempting to reconnect in 5 seconds...")
+            time.Sleep(5 * time.Second)
+        }
+    }
+}
+
+func runSSHForward() error {
     // Read the private key file
     key, err := ioutil.ReadFile(keyPath)
     if err != nil {
-        log.Fatalf("Unable to read private key: %v", err)
+        return fmt.Errorf("unable to read private key: %v", err)
     }
 
     // Create the Signer for this private key
     signer, err := ssh.ParsePrivateKey(key)
     if err != nil {
-        log.Fatalf("Unable to parse private key: %v", err)
+        return fmt.Errorf("unable to parse private key: %v", err)
     }
 
     // Create SSH config
@@ -42,28 +57,30 @@ func main() {
     log.Printf("Connecting to %s...\n", serverAddr)
     client, err := ssh.Dial("tcp", serverAddr, config)
     if err != nil {
-        log.Fatal("Failed to dial: ", err)
+        return fmt.Errorf("failed to dial: %v", err)
     }
     defer client.Close()
     log.Println("Connected successfully")
 
     // Set up remote forwarding
     log.Println("Setting up remote forwarding...")
-    listener, err := client.Listen("tcp", "0.0.0.0:8899")
+    listener, err := client.Listen("tcp", remotePort)
     if err != nil {
-        log.Fatal("Failed to set up remote forwarding: ", err)
+        return fmt.Errorf("failed to set up remote forwarding: %v", err)
     }
     defer listener.Close()
 
-    log.Println("Remote forwarding established. Listening on 0.0.0.0:8899")
+    log.Printf("Remote forwarding established. Listening on %s\n", remotePort)
+
+    // Start health check
+    go healthCheck(client)
 
     // Handle incoming connections
     for {
         log.Println("Waiting for incoming connection...")
         remoteConn, err := listener.Accept()
         if err != nil {
-            log.Println("Failed to accept incoming connection:", err)
-            continue
+            return fmt.Errorf("failed to accept incoming connection: %v", err)
         }
         log.Printf("Accepted connection from %s\n", remoteConn.RemoteAddr())
 
@@ -76,7 +93,7 @@ func handleConnection(remoteConn net.Conn) {
 
     // Connect to local port 22
     log.Println("Connecting to local SSH server...")
-    localConn, err := net.Dial("tcp", "127.0.0.1:22")
+    localConn, err := net.Dial("tcp", localPort)
     if err != nil {
         log.Println("Failed to connect to local port:", err)
         return
@@ -100,22 +117,30 @@ func handleConnection(remoteConn net.Conn) {
     log.Println("Connection closed")
 }
 
-/* run ssh  reverse  server ok: 
-(base) xlisp@xlisp:~$ go run go_ssh_rev3.go
-2024/09/22 12:31:34 Connecting to xxxxx:22...
-2024/09/22 12:31:35 Connected successfully
-2024/09/22 12:31:35 Setting up remote forwarding...
-2024/09/22 12:31:35 Remote forwarding established. Listening on 0.0.0.0:8899
-2024/09/22 12:31:35 Waiting for incoming connection...
-2024/09/22 12:31:50 Accepted connection from 127.0.0.1:42936
-2024/09/22 12:31:50 Waiting for incoming connection...
-2024/09/22 12:31:50 Connecting to local SSH server...
-2024/09/22 12:31:50 Connected to local SSH server
-2024/09/22 12:31:50 Starting bidirectional copy...
+func healthCheck(client *ssh.Client) {
+    ticker := time.NewTicker(10 * time.Second)
+    defer ticker.Stop()
 
-test ssh connect ok:
-ubuntu@ip-172-31-2-171:~$ ssh -p 8899 xlisp@127.0.0.1
-xlisp@127.0.0.1's password:
-Welcome to Ubuntu 24.04.1 LTS (GNU/Linux 6.8.0-45-generic x86_64)
-*/
+    for range ticker.C {
+        // Run netstat command on remote server
+        session, err := client.NewSession()
+        if err != nil {
+            log.Printf("Failed to create session: %v", err)
+            continue
+        }
+        defer session.Close()
 
+        output, err := session.CombinedOutput("netstat -anp | grep 8899")
+        if err != nil {
+            log.Printf("Failed to run netstat command: %v", err)
+            continue
+        }
+
+        // Check if the port is being listened to
+        if strings.Contains(string(output), "LISTEN") {
+            log.Println("Health check passed: Port 8899 is being listened to")
+        } else {
+            log.Println("Health check failed: Port 8899 is not being listened to")
+        }
+    }
+}
