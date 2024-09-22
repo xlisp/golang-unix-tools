@@ -277,3 +277,108 @@ go: downloading github.com/rabbitmq/amqp091-go v1.10.0
 go: added github.com/rabbitmq/amqp091-go v1.10.0
 ```
 
+## ssh内网穿透
+
+```go
+package main
+
+import (
+	"io"
+    "io/ioutil"
+    "log"
+    "net"
+    "time"
+
+    "golang.org/x/crypto/ssh"
+)
+
+func main() {
+    // SSH server details
+    serverAddr := "xxxxxx:22"
+    user := "ubuntu"
+    keyPath := "/home/xlisp/xxxx.pem"
+
+    // Read the private key file
+    key, err := ioutil.ReadFile(keyPath)
+    if err != nil {
+        log.Fatalf("Unable to read private key: %v", err)
+    }
+
+    // Create the Signer for this private key
+    signer, err := ssh.ParsePrivateKey(key)
+    if err != nil {
+        log.Fatalf("Unable to parse private key: %v", err)
+    }
+
+    // Create SSH config
+    config := &ssh.ClientConfig{
+        User: user,
+        Auth: []ssh.AuthMethod{
+            ssh.PublicKeys(signer),
+        },
+        HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+        Timeout:         15 * time.Second,
+    }
+
+    // Connect to SSH server
+    log.Printf("Connecting to %s...\n", serverAddr)
+    client, err := ssh.Dial("tcp", serverAddr, config)
+    if err != nil {
+        log.Fatal("Failed to dial: ", err)
+    }
+    defer client.Close()
+    log.Println("Connected successfully")
+
+    // Set up remote forwarding
+    log.Println("Setting up remote forwarding...")
+    listener, err := client.Listen("tcp", "0.0.0.0:8899")
+    if err != nil {
+        log.Fatal("Failed to set up remote forwarding: ", err)
+    }
+    defer listener.Close()
+
+    log.Println("Remote forwarding established. Listening on 0.0.0.0:8899")
+
+    // Handle incoming connections
+    for {
+        log.Println("Waiting for incoming connection...")
+        remoteConn, err := listener.Accept()
+        if err != nil {
+            log.Println("Failed to accept incoming connection:", err)
+            continue
+        }
+        log.Printf("Accepted connection from %s\n", remoteConn.RemoteAddr())
+
+        go handleConnection(remoteConn)
+    }
+}
+
+func handleConnection(remoteConn net.Conn) {
+    defer remoteConn.Close()
+
+    // Connect to local port 22
+    log.Println("Connecting to local SSH server...")
+    localConn, err := net.Dial("tcp", "127.0.0.1:22")
+    if err != nil {
+        log.Println("Failed to connect to local port:", err)
+        return
+    }
+    defer localConn.Close()
+    log.Println("Connected to local SSH server")
+
+    // Copy data between connections
+    log.Println("Starting bidirectional copy...")
+    go func() {
+        _, err := io.Copy(remoteConn, localConn)
+        if err != nil {
+            log.Println("Error copying data from local to remote:", err)
+        }
+    }()
+
+    _, err = io.Copy(localConn, remoteConn)
+    if err != nil {
+        log.Println("Error copying data from remote to local:", err)
+    }
+    log.Println("Connection closed")
+}
+```
