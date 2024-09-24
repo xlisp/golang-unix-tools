@@ -57,6 +57,8 @@ curl http://127.0.0.1:8080/ping
 ```
 ## clojure core.async VS go goroutine
 
+* [more examples](./go_vs_clojure_async.md)
+
 * channels
 
 ```go
@@ -156,6 +158,136 @@ func main() {
 		return len(it)
 	})
 	fmt.Println(out) // [6, 5, 6, 5]
+}
+
+```
+
+* loop get token
+
+```clj
+(mount/defstate functor-official-account-token-updator
+  :start (let [poison (a/promise-chan)]
+           (a/go-loop [tout (a/timeout 0)]
+             (let [[_ port] (a/alts! [poison tout] :priority true)]
+               (when-not (= port poison)
+                 (let [{:keys [appid secret]} (:functortech @config/functor-api-conf)
+                       {:keys [access_token expires_in] :as res}
+                       (:body (client/get (str
+                                            "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="
+                                            appid
+                                            "&secret="
+                                            secret)
+                                {:accept :json :as :json}))]
+                   (reset! functor-official-account-token access_token)
+                   (if expires_in
+                     (info "functor-official-account access token expires in" expires_in res)
+                     (error "functor-official-account access token error" res))
+                   (recur (a/timeout (* 1000 (if expires_in (/ expires_in 3) 600))))))))
+           poison)
+  :stop (a/close! @functor-official-account-token-updator))
+```
+
+1.	Atomic Value: We use atomic.Value for thread-safe token updates.
+2.	Token Fetching: fetchToken() makes the HTTP request to the WeChat API and decodes the response.
+3.	Periodic Token Refresh: startTokenUpdater() runs a goroutine that periodically fetches the token. It calculates the sleep duration based on the expiration time (expires_in).
+4.	Graceful Stop: The updater can be stopped by closing the stop channel, mimicking the :stop logic from the Clojure version.
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
+	"sync/atomic"
+	"time"
+)
+
+var (
+	// Atomic string to hold the token
+	functorOfficialAccountToken atomic.Value
+	// Configuration holding the appid and secret
+	config = struct {
+		AppID  string
+		Secret string
+	}{
+		AppID:  "your_appid_here",
+		Secret: "your_secret_here",
+	}
+)
+
+// Response structure from the WeChat token API
+type TokenResponse struct {
+	AccessToken string `json:"access_token"`
+	ExpiresIn   int64  `json:"expires_in"`
+}
+
+// fetchToken retrieves the token from the WeChat API
+func fetchToken() (TokenResponse, error) {
+	url := fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", config.AppID, config.Secret)
+	resp, err := http.Get(url)
+	if err != nil {
+		return TokenResponse{}, err
+	}
+	defer resp.Body.Close()
+
+	var result TokenResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return TokenResponse{}, err
+	}
+	return result, nil
+}
+
+// startTokenUpdater starts a goroutine that fetches the token periodically
+func startTokenUpdater() chan struct{} {
+	stop := make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <-stop:
+				return
+			default:
+				// Fetch the token
+				tokenResp, err := fetchToken()
+				if err != nil {
+					log.Printf("Error fetching token: %v", err)
+					time.Sleep(10 * time.Minute) // Retry after 10 minutes if error
+					continue
+				}
+
+				// Store the token
+				functorOfficialAccountToken.Store(tokenResp.AccessToken)
+				log.Printf("Token fetched successfully, expires in %d seconds", tokenResp.ExpiresIn)
+
+				// Calculate next update time as a third of the expiration time, or default to 10 minutes if not provided
+				updateInterval := time.Duration(tokenResp.ExpiresIn/3) * time.Second
+				if updateInterval <= 0 {
+					updateInterval = 10 * time.Minute
+				}
+
+				time.Sleep(updateInterval)
+			}
+		}
+	}()
+	return stop
+}
+
+func stopTokenUpdater(stop chan struct{}) {
+	close(stop)
+}
+
+func main() {
+	// Start the token updater
+	stop := startTokenUpdater()
+
+	// Simulate running for a while
+	time.Sleep(30 * time.Minute)
+
+	// Stop the token updater
+	stopTokenUpdater(stop)
+
+	log.Println("Token updater stopped.")
 }
 
 ```
