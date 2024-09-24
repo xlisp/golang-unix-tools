@@ -17,6 +17,7 @@ __global__ void matrixMultiply(float *A, float *B, float *C, int N) {
 }
 
 extern "C" void launchMatrixMultiply(float *A, float *B, float *C, int N) {
+    printf("Launch Matrix Multiply called with N=%d\n", N);
     float *d_A, *d_B, *d_C;
     size_t size = N * N * sizeof(float);
 

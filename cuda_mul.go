@@ -1,12 +1,13 @@
 package main
 
 /*
-#cgo LDFLAGS: -L/usr/local/cuda/lib64 -lcudart
+#cgo LDFLAGS: -L/path/to/libmatrix/ -lmatrix -L/usr/local/cuda/lib64 -lcudart
 #include <cuda_runtime.h>
 
 void launchMatrixMultiply(float *A, float *B, float *C, int N);
 */
 import "C"
+
 import (
     "fmt"
     "unsafe"
