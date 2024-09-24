@@ -12,6 +12,7 @@
   - [调用C语言](#%E8%B0%83%E7%94%A8c%E8%AF%AD%E8%A8%80)
   - [run test](#run-test)
   - [add lib](#add-lib)
+  - [ast解析函数关系](#ast解析函数关系)
   - [ssh内网穿透](#ssh%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F)
   - [ssh内网穿透,断网自动重连](#ssh%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F%E6%96%AD%E7%BD%91%E8%87%AA%E5%8A%A8%E9%87%8D%E8%BF%9E)
 
@@ -278,6 +279,112 @@ $ go get github.com/rabbitmq/amqp091-go
 
 go: downloading github.com/rabbitmq/amqp091-go v1.10.0
 go: added github.com/rabbitmq/amqp091-go v1.10.0
+```
+
+## ast解析函数关系
+
+```go
+package main
+
+import (
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"os"
+	"path/filepath"
+)
+
+var functionCalls = make(map[string][]string)
+
+// Parse the function calls in a function declaration
+func inspectFuncDecl(node ast.Node) bool {
+	// We are only interested in function declarations
+	funcDecl, ok := node.(*ast.FuncDecl)
+	if !ok {
+		return true
+	}
+
+	funcName := funcDecl.Name.Name
+
+	// Traverse the function body to find function calls
+	ast.Inspect(funcDecl.Body, func(n ast.Node) bool {
+		callExpr, ok := n.(*ast.CallExpr)
+		if !ok {
+			return true
+		}
+
+		// Get the name of the called function
+		switch fun := callExpr.Fun.(type) {
+		case *ast.Ident:
+			// Simple function call
+			functionCalls[funcName] = append(functionCalls[funcName], fun.Name)
+		case *ast.SelectorExpr:
+			// Method call (e.g., obj.Method)
+			functionCalls[funcName] = append(functionCalls[funcName], fun.Sel.Name)
+		}
+		return true
+	})
+
+	return true
+}
+
+// Generate the Graphviz DOT format output
+func generateDot() {
+	fmt.Println("digraph G {")
+	for caller, callees := range functionCalls {
+		for _, callee := range callees {
+			fmt.Printf("    \"%s\" -> \"%s\";\n", caller, callee)
+		}
+	}
+	fmt.Println("}")
+}
+
+// Parse all Go files in the given directory
+func parseGoFilesInDir(dir string) {
+	fs := token.NewFileSet()
+
+	// Walk through the directory to find Go files
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Only process .go files
+		if filepath.Ext(path) == ".go" {
+			node, err := parser.ParseFile(fs, path, nil, 0)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error parsing file: %v\n", err)
+				return err
+			}
+
+			// Walk through the AST and inspect function declarations
+			ast.Inspect(node, inspectFuncDecl)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error walking through directory: %v\n", err)
+		os.Exit(1)
+	}
+}
+
+func main() {
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: go run main.go <path_to_directory>")
+		return
+	}
+	// Parse the directory
+	dir := os.Args[1]
+	parseGoFilesInDir(dir)
+
+	// Generate Graphviz DOT output
+	generateDot()
+}
+
+// run : is perfect！=》go run show_fun_refs_project.go /Users/emacspy/GoPro/xxxxx
 ```
 
 ## ssh内网穿透
