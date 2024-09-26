@@ -19,8 +19,16 @@
 
 ## defer func
 
+when function do finished, will do defer
+
 ```go
 func (wrapper *Wrapper) buildSomthing() {
+
+... or
+
+	wrapper.Lock()
+	defer wrapper.Unlock()
+
 ...
 	wrapper.Lock()
 	defer func() {
