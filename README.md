@@ -3,6 +3,8 @@
 * 系统底层脚本(代理,内网穿透~), docker hacker, cuda等C++库调用...
 
 - [jim-emacs-fun-go](#jim-emacs-fun-go)
+  - [defer func](#defer-func)
+  - [go struct](#go-struct)
   - [gin](#gin)
   - [clojure core.async VS go goroutine](#clojure-coreasync-vs-go-goroutine)
   - [map](#map)
@@ -15,6 +17,28 @@
   - [ast解析函数关系](#ast解析函数关系)
   - [ssh内网穿透,断网自动重连](#ssh%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F%E6%96%AD%E7%BD%91%E8%87%AA%E5%8A%A8%E9%87%8D%E8%BF%9E)
 
+## defer func
+
+```go
+func (wrapper *Wrapper) buildSomthing() {
+...
+	wrapper.Lock()
+	defer func() {
+		wrapper.Unlock()
+		...
+	}()
+...
+}
+```
+
+## go struct 
+
+```go
+type Wrapper struct {
+        mqToChannel <-chan string
+        someStatus bool
+}
+```
 
 ## gin
 
