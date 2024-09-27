@@ -2,3 +2,4 @@ zshrc2md
 go_ssh_reverse_proxy_2.go
 *.so
 main
+cppcode.o
