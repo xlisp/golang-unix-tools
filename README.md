@@ -1,6 +1,7 @@
 
 # jim-emacs-fun-go
-* 系统底层脚本(代理,内网穿透~), docker hacker, cuda等C++库调用...
+* 系统底层脚本(代理,内网穿透~), Docker hacker, cuda等C/C++库调用, Unix高性能工具等
+
 
 - [jim-emacs-fun-go](#jim-emacs-fun-go)
   - [defer func](#defer-func)
