@@ -447,6 +447,8 @@ go: added github.com/rabbitmq/amqp091-go v1.10.0
 
 ## ast解析函数关系
 
+![详细教程使用查看go项目的函数调用关系](./show_fun_refs_project.md)
+
 ```go
 package main
 
