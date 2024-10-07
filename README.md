@@ -553,6 +553,9 @@ func main() {
 
 
 ## ssh内网穿透,断网自动重连
+
+![详细使用教程](https://github.com/xlisp/golang-unix-tools/blob/master/go_ssh_reverse_proxy.md)
+
 ```go
 package main
 

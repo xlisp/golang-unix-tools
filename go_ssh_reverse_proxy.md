@@ -40,10 +40,10 @@ npm install pm2 -g
 
 ```bash
 # 进入程序所在的目录
-cd /path/to/your/program
+cd ~/golang-unix-tools
 
 # 编译程序
-go build -o ssh_forward
+go build  go_ssh_reverse_proxy.go
 ```
 
 ##### 3. 使用PM2管理编译后的Go程序
@@ -52,7 +52,7 @@ go build -o ssh_forward
 
 ```bash
 # 启动程序并让它在后台运行
-pm2 start ./ssh_forward --name "ssh-forward"
+pm2 start ./go_ssh_reverse_proxy --name "ssh-forward"
 
 # 查看程序状态
 pm2 status
@@ -79,7 +79,8 @@ pm2 save
 ### 支持平台：
 
 - **Windows**：可通过命令行、Powershell执行PM2，并且在系统启动时自动启动转发服务。
-- **macOS**：可以通过终端使用PM2，并设置开机自动启动服务。
+- **macOS**：可以通过终端使用PM2，并设置开机自动启动服务。下载地址: ![go_ssh_reverse_proxy_mac](./go_ssh_reverse_proxy_mac)
 
 通过以上步骤，你可以在Windows和macOS上使用PM2轻松管理你的SSH端口转发程序，保证远程服务器端口的稳定访问。
+
 
