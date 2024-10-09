@@ -430,10 +430,13 @@ Result: 30
 
 
 ## run test
-* `*_test.go`
-
+* run all path `*_test.go`
 ```
-go test
+go test ./...
+```
+* run current path `./*_test.go`
+```
+cd path && go test
 ```
 
 ## add lib
