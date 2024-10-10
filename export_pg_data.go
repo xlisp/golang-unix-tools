@@ -36,7 +36,7 @@ func main() {
 		}
 
 		// Create markdown file with the id as the filename
-		fileName := fmt.Sprintf("%d.md", id)
+		fileName := fmt.Sprintf("text2code_%d.md", id)
 		file, err := os.Create(fileName)
 		if err != nil {
 			log.Fatal(err)
