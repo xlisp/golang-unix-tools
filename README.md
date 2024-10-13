@@ -1,4 +1,3 @@
-
 # jim-emacs-fun-go
 * System underlying scripts (proxy, intranet penetration~), Docker hacker, cuda and other C/C++ library calls, Unix high-performance tools, etc.
 
@@ -9,14 +8,14 @@
   - [gin](#gin)
   - [clojure core.async VS go goroutine](#clojure-coreasync-vs-go-goroutine)
   - [map](#map)
-  - [函数作为参数](#%E5%87%BD%E6%95%B0%E4%BD%9C%E4%B8%BA%E5%8F%82%E6%95%B0)
-  - [递归](#%E9%80%92%E5%BD%92)
+  - [Function as Parameter](#function-as-parameter)
+  - [Recursion](#recursion)
   - [functor](#functor)
-  - [调用C语言](#%E8%B0%83%E7%94%A8c%E8%AF%AD%E8%A8%80)
+  - [Calling C Language](#calling-c-language)
   - [run test](#run-test)
   - [add lib](#add-lib)
-  - [ast解析函数关系](#ast解析函数关系)
-  - [ssh内网穿透,断网自动重连](#ssh%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F%E6%96%AD%E7%BD%91%E8%87%AA%E5%8A%A8%E9%87%8D%E8%BF%9E)
+  - [AST Parsing Function Relationships](#ast-parsing-function-relationships)
+  - [SSH Tunneling and Auto Reconnect](#ssh-tunneling-and-auto-reconnect)
 
 ## defer func
 
@@ -112,7 +111,7 @@ func main() {
 }
 ```
 
-vs: clojure的>!! 和 go的c <- , clojure的<!!和 <-c
+vs: clojure's >!! and go's c <- , clojure's <!! and <-c
 
 ```clojure
 (defn boring [msg c]
@@ -450,7 +449,7 @@ go: added github.com/rabbitmq/amqp091-go v1.10.0
 
 ## AST Parsing Function Relationships
 
-![详细教程使用查看go项目的函数调用关系](./show_fun_refs_project.md)
+![Detailed tutorial on viewing function call relationships in a Go project](./show_fun_refs_project.md)
 
 ```go
 package main
@@ -559,7 +558,7 @@ func main() {
 
 ## SSH Tunneling and Auto Reconnect
 
-![详细使用教程](https://github.com/xlisp/golang-unix-tools/blob/master/go_ssh_reverse_proxy.md)
+![Detailed usage tutorial](https://github.com/xlisp/golang-unix-tools/blob/master/go_ssh_reverse_proxy.md)
 
 ```go
 package main
@@ -708,5 +707,3 @@ func healthCheck(client *ssh.Client) {
         }
     }
 }
-```
-

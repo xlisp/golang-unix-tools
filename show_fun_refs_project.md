@@ -1,26 +1,26 @@
-这个脚本是使用Go语言和`go/ast`包来解析指定目录中的Go语言源文件，提取函数调用关系并将其输出为Graphviz的DOT格式。Graphviz是一种用于绘制关系图的工具，而DOT语言是一种描述这些图的文本格式。通过将函数调用关系以DOT格式输出，我们可以很方便地使用Graphviz生成可视化的函数调用关系图。
+This script uses Go language and the `go/ast` package to parse Go source files in a specified directory, extract function call relationships, and output them in Graphviz DOT format. Graphviz is a tool for drawing relationship graphs, and DOT language is a text format for describing these graphs. By outputting function call relationships in DOT format, we can easily use Graphviz to generate visualized function call relationship graphs.
 
-### 脚本功能：
-1. **解析Go源文件中的函数声明和函数调用**：
-   - 该脚本使用`go/ast`包解析Go源文件的抽象语法树（AST），从中提取函数声明和函数调用。
-   - 每当脚本发现一个函数声明时，它会检查该函数内部的函数调用，并将调用关系存储在`functionCalls`映射中。该映射以调用者函数为键，以被调用的函数列表为值。
+### Script Features:
+1. **Parse function declarations and function calls in Go source files**:
+   - The script uses the `go/ast` package to parse the abstract syntax tree (AST) of Go source files, extracting function declarations and function calls.
+   - Whenever the script finds a function declaration, it checks for function calls within that function and stores the call relationships in the `functionCalls` map. This map uses the caller function as the key and the list of called functions as the value.
 
-2. **输出Graphviz的DOT格式**：
-   - 脚本通过遍历函数调用映射，生成以DOT语言格式表示的调用关系图，输出到控制台。
-   - 每个调用关系以 `"caller" -> "callee";` 形式输出，Graphviz可以根据该输出生成函数调用的可视化图形。
+2. **Output in Graphviz DOT format**:
+   - The script generates a call relationship graph in DOT language format by traversing the function call map and outputs it to the console.
+   - Each call relationship is output in the form of `"caller" -> "callee";`, which Graphviz can use to generate a visualized graph of function calls.
 
-### 运行步骤：
-1. 将该脚本保存为`.go`文件（例如`show_fun_refs_project.go`）。
-2. 在终端中运行以下命令，其中`<path_to_directory>`是你要解析的Go源文件所在的目录路径：
+### Running Steps:
+1. Save the script as a `.go` file (e.g., `show_fun_refs_project.go`).
+2. Run the following command in the terminal, where `<path_to_directory>` is the path to the directory containing the Go source files you want to parse:
 
    ```bash
    go run show_fun_refs_project.go <path_to_directory>
    ```
 
-3. 脚本会解析指定目录中的所有Go文件，并输出函数调用关系图的DOT格式。
+3. The script will parse all Go files in the specified directory and output the function call relationship graph in DOT format.
 
-### 示例输出：
-假设我们在某个目录中有以下两个简单的Go函数：
+### Example Output:
+Suppose we have the following two simple Go functions in a directory:
 
 ```go
 func A() {
@@ -32,7 +32,7 @@ func B() {
 }
 ```
 
-执行脚本后，控制台会输出如下的DOT格式：
+After executing the script, the console will output the following DOT format:
 
 ```dot
 digraph G {
@@ -41,13 +41,12 @@ digraph G {
 }
 ```
 
-这个输出表示函数`A`调用了函数`B`，而函数`B`又调用了函数`C`。你可以将这个输出保存为`.dot`文件，并使用Graphviz工具将其渲染为可视化的调用关系图。
+This output indicates that function `A` calls function `B`, and function `B` calls function `C`. You can save this output as a `.dot` file and use Graphviz tools to render it into a visualized function call relationship graph.
 
-### 脚本的使用场景：
-1. **代码审查**：帮助开发者快速了解项目中的函数调用关系。
-2. **软件可视化**：生成函数调用图，有助于分析代码的结构和依赖关系。
-3. **调试和优化**：通过查看函数调用链，发现可能的性能瓶颈或逻辑问题。
+### Use Cases for the Script:
+1. **Code Review**: Helps developers quickly understand function call relationships in a project.
+2. **Software Visualization**: Generates function call graphs, aiding in the analysis of code structure and dependencies.
+3. **Debugging and Optimization**: By viewing the function call chain, potential performance bottlenecks or logical issues can be discovered.
 
-### 总结：
-这个Go脚本利用`go/ast`包解析Go源代码，提取函数之间的调用关系，并生成Graphviz的DOT格式输出。它可以帮助开发者更好地理解代码结构，并通过可视化的方式展示复杂项目中的函数调用链。
-
+### Summary:
+This Go script uses the `go/ast` package to parse Go source code, extract function call relationships, and generate output in Graphviz DOT format. It can help developers better understand code structure and visualize function call chains in complex projects.

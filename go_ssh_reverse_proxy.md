@@ -1,86 +1,84 @@
-这个程序的主要作用是通过SSH协议实现本地端口转发，将远程服务器上的指定端口（如8899）映射到本地端口，从而使你能够访问远程服务器上的服务。该程序会不断监控连接情况，并定期执行健康检查（通过运行远程服务器上的`netstat`命令检查端口8899是否在监听状态）。如果连接断开，它会在5秒后自动重试，确保转发服务稳定运行。
+The main purpose of this program is to implement local port forwarding through the SSH protocol, mapping a specified port (such as 8899) on the remote server to a local port, allowing you to access services on the remote server. The program continuously monitors the connection status and performs regular health checks (by running the `netstat` command on the remote server to check if port 8899 is in a listening state). If the connection is lost, it automatically retries after 5 seconds, ensuring stable operation of the forwarding service.
 
-### 功能说明：
+### Functionality:
 
-1. **SSH连接与端口转发**：
-   - 程序首先通过SSH与远程服务器建立连接，并将远程服务器上的端口（如8899）通过SSH隧道映射到本地的端口22。
+1. **SSH Connection and Port Forwarding**:
+   - The program first establishes an SSH connection with the remote server and maps a port on the remote server (e.g., 8899) to local port 22 through an SSH tunnel.
    
-2. **自动重连**：
-   - 如果连接断开，程序会自动重新连接，避免手动干预，确保服务的持续性。
+2. **Automatic Reconnection**:
+   - If the connection is lost, the program automatically reconnects, avoiding manual intervention and ensuring service continuity.
 
-3. **健康检查**：
-   - 每10秒钟，程序会通过SSH连接执行远程`netstat`命令，检查远程服务器的8899端口是否处于监听状态，以确保转发正常运行。
+3. **Health Check**:
+   - Every 10 seconds, the program executes a remote `netstat` command via the SSH connection to check if port 8899 on the remote server is in a listening state, ensuring the forwarding is functioning normally.
 
-4. **双向数据转发**：
-   - 程序通过`io.Copy`实现双向的数据转发，确保远程和本地的端口通信畅通。
+4. **Bidirectional Data Forwarding**:
+   - The program implements bidirectional data forwarding using `io.Copy`, ensuring smooth communication between remote and local ports.
 
-### 使用PM2管理程序
+### Using PM2 to Manage the Program
 
-为了方便在生产环境中长期运行该程序，建议使用PM2来管理和监控这个Go程序。PM2是一个强大的进程管理工具，可以在系统启动时自动启动程序，监控运行状态，并支持Windows和macOS。
+To facilitate long-term running of this program in a production environment, it is recommended to use PM2 to manage and monitor this Go program. PM2 is a powerful process management tool that can automatically start programs at system startup, monitor running status, and supports both Windows and macOS.
 
-#### 安装与使用步骤：
+#### Installation and Usage Steps:
 
-##### 1. 安装PM2
+##### 1. Install PM2
 
-PM2是基于Node.js的工具，所以需要先安装Node.js，然后通过npm安装PM2。
+PM2 is a Node.js-based tool, so you need to install Node.js first, then install PM2 via npm.
 
-**Windows与macOS下的安装命令如下：**
+**Installation commands for Windows and macOS:**
 
 ```bash
-# 安装Node.js（如果未安装）
-# 可以从Node.js官方网站下载 https://nodejs.org/
-# 安装完成后，使用以下命令安装PM2
+# Install Node.js (if not installed)
+# You can download it from the official Node.js website: https://nodejs.org/
+# After installation, use the following command to install PM2
 
 npm install pm2 -g
 ```
 
-##### 2. 编译Go程序
+##### 2. Compile the Go Program
 
-首先确保Go环境已经安装，然后编译你的Go程序。
+First, ensure that the Go environment is installed, then compile your Go program.
 
 ```bash
-# 进入程序所在的目录
+# Navigate to the program directory
 cd ~/golang-unix-tools
 
-# 编译程序
-go build  go_ssh_reverse_proxy.go
+# Compile the program
+go build go_ssh_reverse_proxy.go
 ```
 
-##### 3. 使用PM2管理编译后的Go程序
+##### 3. Use PM2 to Manage the Compiled Go Program
 
-使用以下命令启动并管理你的Go程序：
+Use the following commands to start and manage your Go program:
 
 ```bash
-# 启动程序并让它在后台运行
+# Start the program and let it run in the background
 pm2 start ./go_ssh_reverse_proxy --name "ssh-forward"
 
-# 查看程序状态
+# View program status
 pm2 status
 
-# 如果需要停止或重启
+# If you need to stop or restart
 pm2 stop ssh-forward
 pm2 restart ssh-forward
 ```
 
-##### 4. 设置PM2开机自启动
+##### 4. Set PM2 to Start on Boot
 
-你可以设置PM2让它在系统启动时自动启动你的Go程序。
+You can set PM2 to automatically start your Go program when the system boots.
 
 ```bash
-# 生成启动配置
+# Generate startup configuration
 pm2 startup
 
-# 保存当前运行的进程列表
+# Save the current list of running processes
 pm2 save
 ```
 
-这样，无论是Windows还是macOS，系统重启后PM2都会自动启动并管理该Go程序。
+This way, whether on Windows or macOS, PM2 will automatically start and manage the Go program after system reboot.
 
-### 支持平台：
+### Supported Platforms:
 
-- **Windows**：可通过命令行、Powershell执行PM2，并且在系统启动时自动启动转发服务。
-- **macOS**：可以通过终端使用PM2，并设置开机自动启动服务。下载地址: ![go_ssh_reverse_proxy_mac](./go_ssh_reverse_proxy_mac)
+- **Windows**: PM2 can be executed via command line or PowerShell, and the forwarding service can be automatically started at system boot.
+- **macOS**: PM2 can be used through the terminal, and the service can be set to start automatically at boot. Download link: ![go_ssh_reverse_proxy_mac](./go_ssh_reverse_proxy_mac)
 
-通过以上步骤，你可以在Windows和macOS上使用PM2轻松管理你的SSH端口转发程序，保证远程服务器端口的稳定访问。
-
-
+By following these steps, you can easily manage your SSH port forwarding program using PM2 on both Windows and macOS, ensuring stable access to remote server ports.

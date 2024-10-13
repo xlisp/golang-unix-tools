@@ -4,8 +4,8 @@ import "fmt"
 
 func fibonacci() func() int {
 	a, b := 0, 1
-	
-	// 函数返回函数
+
+	// Function returns a function
 	return func() int {
 		a, b = b, a+b
 		return a
@@ -13,13 +13,14 @@ func fibonacci() func() int {
 }
 
 func main() {
-	// 变量是函数的赋值写法
+	// Assigning a function to a variable
 	f := fibonacci()
 
 	for i := 0; i < 10; i++ {
 		fmt.Println(f())
 	}
 }
+
 // ==>>
 // 1
 // 1
@@ -31,4 +32,3 @@ func main() {
 // 21
 // 34
 // 55
-// 

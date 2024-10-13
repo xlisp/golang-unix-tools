@@ -1,10 +1,11 @@
 package main
-// go写的zshrc笔记解析为markdown大纲
+
+// Go script to parse zshrc notes into a markdown outline
 import (
 	"fmt"
-	"strings"
-	"regexp"
 	"io/ioutil"
+	"regexp"
+	"strings"
 )
 
 func repeatString(input string, times int) string {
@@ -32,6 +33,4 @@ func main() {
 			}
 		}
 	}
-
 }
-
