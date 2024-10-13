@@ -220,10 +220,10 @@ func main() {
   :stop (a/close! @functor-official-account-token-updator))
 ```
 
-1.	Atomic Value: We use atomic.Value for thread-safe token updates.
-2.	Token Fetching: fetchToken() makes the HTTP request to the WeChat API and decodes the response.
-3.	Periodic Token Refresh: startTokenUpdater() runs a goroutine that periodically fetches the token. It calculates the sleep duration based on the expiration time (expires_in).
-4.	Graceful Stop: The updater can be stopped by closing the stop channel, mimicking the :stop logic from the Clojure version.
+1. Atomic Value: We use atomic.Value for thread-safe token updates.
+2. Token Fetching: fetchToken() makes the HTTP request to the WeChat API and decodes the response.
+3. Periodic Token Refresh: startTokenUpdater() runs a goroutine that periodically fetches the token. It calculates the sleep duration based on the expiration time (expires_in).
+4. Graceful Stop: The updater can be stopped by closing the stop channel, mimicking the :stop logic from the Clojure version.
 
 ```go
 package main
@@ -553,7 +553,7 @@ func main() {
 	generateDot()
 }
 
-// run : is perfect！=》go run show_fun_refs_project.go /Users/emacspy/GoPro/xxxxx
+	// run: is perfect! => go run show_fun_refs_project.go /Users/emacspy/GoPro/xxxxx
 ```
 
 
