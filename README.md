@@ -1,6 +1,6 @@
 
 # jim-emacs-fun-go
-* 系统底层脚本(代理,内网穿透~), Docker hacker, cuda等C/C++库调用, Unix高性能工具等
+* System underlying scripts (proxy, intranet penetration~), Docker hacker, cuda and other C/C++ library calls, Unix high-performance tools, etc.
 
 
 - [jim-emacs-fun-go](#jim-emacs-fun-go)
