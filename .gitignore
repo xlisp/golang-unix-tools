@@ -4,3 +4,4 @@ go_ssh_reverse_proxy_2.go
 main
 cppcode.o
 search_md_by_kws
+.aider*
