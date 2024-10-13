@@ -130,7 +130,7 @@ vs: clojure的>!! 和 go的c <- , clojure的<!!和 <-c
 
 * function that returns a channel
 
-go 宏把函数包起来
+// Function returns another function
 
 ```go
 func boring(msg string) <-chan string { // Returns receive-only channel of strs.
@@ -553,7 +553,7 @@ func main() {
 	generateDot()
 }
 
-	// run: is perfect! => go run show_fun_refs_project.go /Users/emacspy/GoPro/xxxxx
+	// =>> Refactored
 ```
 
 
