@@ -325,7 +325,7 @@ func main() {
 
 ```
 
-## 函数作为参数
+## Function as Parameter
 
 ```go
 
@@ -344,7 +344,7 @@ func main(){
 }
 
 ```
-## 递归
+## Recursion
 
 ```go
 func factorialTailRecursive(num int) int {
@@ -394,7 +394,7 @@ func main() {
 
 ```
 
-## 调用C语言
+## Calling C Language
 
 ```c
 // add.c
@@ -448,7 +448,7 @@ go: downloading github.com/rabbitmq/amqp091-go v1.10.0
 go: added github.com/rabbitmq/amqp091-go v1.10.0
 ```
 
-## ast解析函数关系
+## AST Parsing Function Relationships
 
 ![详细教程使用查看go项目的函数调用关系](./show_fun_refs_project.md)
 
@@ -557,7 +557,7 @@ func main() {
 ```
 
 
-## ssh内网穿透,断网自动重连
+## SSH Tunneling and Auto Reconnect
 
 ![详细使用教程](https://github.com/xlisp/golang-unix-tools/blob/master/go_ssh_reverse_proxy.md)
 
