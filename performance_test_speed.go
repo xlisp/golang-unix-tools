@@ -100,3 +100,16 @@ Number of CPUs: 8
 Performance score: 0.58 (lower is better)
 
 */
+
+/* Ubuntu PC run:
+
+(base) ➜  golang-unix-tools git:(master) ./performance_test_speed
+Found 1229 prime numbers
+Floating-point operations result: 0.20
+Fibonacci(40) = 102334155
+Total execution time: 770.770276ms
+Number of CPUs: 20
+Performance score: 0.77 (lower is better)
+
+*/
+
