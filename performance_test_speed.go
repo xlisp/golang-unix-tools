@@ -88,3 +88,15 @@ func performFloatingPointOperations() {
 	fmt.Printf("Floating-point operations result: %.2f\n", result)
 }
 
+/* Mac run :
+ golang-unix-tools  master @ go build performance_test_speed.go
+
+ golang-unix-tools  master @ ./performance_test_speed
+Found 1229 prime numbers
+Floating-point operations result: 0.20
+Fibonacci(40) = 102334155
+Total execution time: 577.379344ms
+Number of CPUs: 8
+Performance score: 0.58 (lower is better)
+
+*/
