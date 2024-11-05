@@ -19,7 +19,7 @@ func repeatString(input string, times int) string {
 }
 
 func main() {
-	str1, _ := ioutil.ReadFile("/Users/emacspy/.xonshrc")
+	str1, _ := ioutil.ReadFile("/home/xlisp/.zshrc")
 	stri := string(str1)
 	lines := strings.Split(stri, "\n")
 
@@ -29,7 +29,11 @@ func main() {
 			outlines := outlineRe.Split(strings.Replace(line, "##", "", 1), -1)
 			for num, outline := range outlines {
 				oline := strings.TrimSpace(outline)
-				fmt.Println(repeatString("    ", num) + "- " + oline)
+				if (num == 0) { 
+					fmt.Println(repeatString("    ", num) + "    - ^ " + oline)
+				} else {
+					fmt.Println(repeatString("    ", num) + "    - " + oline)
+				}
 			}
 		}
 	}
